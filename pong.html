@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <body bgcolor="800000">
+
+<style>
+    canvas {background-color : White;}
+</style>
+
+<center><script>
+// Pre processing Canvas setup
+
+var animate = window  .requestAnimationFrame ||
+  window.webkitRequestAnimationFrame ||
+  window.mozRequestAnimationFrame ||
+  function(callback) { window.setTimeout(callback, 1000/60) };
+var canvas = document.createElement('canvas');
+var width = 600;
+var height = 400;
+canvas.width = width;
+canvas.height = height
+canvas.style = "position:absolute; left: 50%; width: 1000px; margin-left: -500px;";
+var context = canvas.getContext('2d');
+window.onload = function() {
+  document.body.appendChild(canvas);
+};
+
+function DisplayFrames(){
+setInterval(NextFrame,25);
+}
+var keysDown = {};
+
+window.addEventListener("keydown", function(event) {
+  keysDown[event.keyCode] = true;
+});
+
+window.addEventListener("keyup", function(event) {
+  delete keysDown[event.keyCode];
+});
+
+
+// Global Variables and initializations
+var paddleheight;
+var paddlewidth;
+paddleheight=50;
+paddlewidth=10;
+var player1x;
+var player1y;
+var player2x;
+var player2y;
+player1x=10;
+player1y=175;
+player2x=580;
+player2y=175;
+var paddle1speed;
+var paddle2speed;
+paddle1speed=4;
+paddle2speed=0;
+var ballx;
+var bally;
+ballx=300;
+bally=200;
+radius = 5;
+var xspeed;
+var yspeed;
+xspeed=3;
+yspeed=0;
+var score1;
+var score2;
+score1=0;
+score2=0;
+// Old player Global Variations and initializations
+var oldplayer1x;
+var oldplayer1y;
+var oldplayer2x;
+var oldplayer2y;
+oldplayer1x=10;
+oldplayer1y=175;
+oldplayer2x=580;
+oldplayer2y=175;
+// Old Ball Variations
+var oldballx;
+var oldbally;
+oldballx=300;
+oldbally=200;
+radius = 5;
+var xspeed;
+var yspeed;
+xspeed=3;
+yspeed=0;
+
+/*Function declarations*/
+//draws the game pieces
+function DrawGamePieces()
+{
+  //paddle 1
+context.beginPath();
+context.lineWidth = 1;
+context.strokeStyle = "white";
+context.fillStyle = "green";
+context.fillRect(player1x,player1y,paddlewidth,paddleheight);
+context.fill();
+context.stroke();
+// paddle 2
+context.beginPath();
+context.lineWidth = 1;
+context.strokeStyle = "white";
+context.fillStyle = "magenta";
+context.fillRect(player2x,player2y,paddlewidth,paddleheight);
+context.fill();
+context.stroke();
+// ball
+context.beginPath();
+context.lineWidth = 1;
+context.strokeStyle = "white";
+context.fillStyle = "blue";
+context.arc(ballx, bally, 2*radius,0,2 * Math.PI, false);
+context.fill();
+context.stroke();
+}
+
+//erases the game pieces by whiping where the paddle and ball used to be with a white paddle and ball
+function EraseGamePieces(){
+context.beginPath();
+context.lineWidth = 1;
+context.strokeStyle = "white";
+context.fillStyle = "white";
+context.fillRect(player1x,oldplayer1y,paddlewidth,paddleheight);
+context.fillRect(player2x,oldplayer2y,paddlewidth,paddleheight);
+context.arc(oldballx, oldbally, 2*radius, 0, 2 * Math.PI, false);
+context.fill();
+context.stroke();
+}
+
+function resetball(){
+  ballx=300;
+  bally=200;
+}
+// Outline what goes on in each animation frame
+function NextFrame(){
+EraseGamePieces();//erase old stuff
+DrawGamePieces();//draw new stuff
+
+//make a record of where the new stuff is, call these old locations
+oldplayer1y=player1y;
+oldplayer2y=player2y;
+oldbally=bally;
+oldballx=ballx;
+
+
+//move all the stuff
+ballx+=xspeed;
+bally+=yspeed;
+
+// Interpret Keyboard Input
+for(var key in keysDown) {
+  var value = Number(key);
+  if(value == 38) { // down arrow
+    player2y -= paddle1speed;
+  } else if (value == 40) { // up arrow
+    player2y += paddle1speed;
+  } else {}
+  }
+
+  for(var key in keysDown) {
+    var value = Number(key);
+    if(value == 87) { // down arrow
+      player1y -= paddle1speed;
+    } else if (value == 83) { // up arrow
+      player1y += paddle1speed;
+    } else {}
+    }
+
+
+// Bouncing off top and bottom
+if(bally - 5 < 0)
+  { // hitting the bottom wall
+    bally = 5;
+    yspeed = -yspeed;
+  }
+  else if(bally  + 5 > 400)
+  { // hitting the top wall
+    bally  = 395;
+    yspeed = -yspeed;
+  }
+
+  if (ballx > 600) {
+    score1 += 1;
+    resetball();
+  }
+
+  if (ballx < 0) {
+    score2 += 1;
+    resetball();
+  }
+
+// Bouncing off paddles
+if (ballx > 300)
+  {
+    if(bally - 5 < (player2y+ paddleheight) &&
+      bally + 5 > player2y &&
+      ballx - 5 < (player2x  + paddlewidth) &&
+      ballx + 5 > player2x)
+    { // hit the right player's paddle
+      yspeed += (paddle2speed / 2);
+      xspeed = -3;
+      ballx += xspeed;
+    }
+  }
+
+if (ballx < 300)
+  {
+    if(bally - 5 < (player1y+ paddleheight) &&
+      bally + 5 > player1y &&
+      ballx - 5 < (player1x  + paddlewidth) &&
+      ballx + 5 > player1x)
+    { // hit the right player's paddle
+      yspeed += (paddle1speed / 2);
+      xspeed = 3;
+      ballx += xspeed;
+    }
+  }
+}
+// Animate the game
+DisplayFrames();
+
+document.getElementById('score1').innerHTML = s;
+document.getElementById('score2').innerHTML = s;
+
+</script></center>
+<center><p id="score1">Player 1 score</p></center>
+<center><p id="score2">Player 2 score</p></center>
+</body>
+</html>
